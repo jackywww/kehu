@@ -133,11 +133,11 @@ func getTokenString(id string)(tokenString string) {
       panic(err)
   }
 
-  claims := make(jwt.MapClaims)
-  claims["exp"] = time.Now().Add(time.Hour * time.Duration(Config.Rsa.Exp)).Unix()
-  claims["iat"] = time.Now().Unix()
-  claims["iss"] = Config.Rsa.Iss
-  claims["id"] = id
+  claims := &jwt.StandardClaims{
+                ExpiresAt: time.Now().Add(time.Hour * time.Duration(Config.Rsa.Exp)).Unix(),
+                Issuer:    Config.Rsa.Iss,
+                Id: id,
+        }
 
   method := jwt.GetSigningMethod(Config.Rsa.SigningMethod)
   token := jwt.NewWithClaims(method, claims)
@@ -336,5 +336,5 @@ func main() {
     c.Set("data", gin.H{"token": tokenString})
 	})
 
-  router.Run(":8080")
+  router.Run(":8081")
 }
